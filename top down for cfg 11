@@ -1,0 +1,51 @@
+  #11. Implement a simple top-down parser for context-free grammars using python
+def expr(tokens):
+    term_result = term(tokens)
+
+    if len(tokens) > 0 and (tokens[0] == '+' or tokens[0] == '-'):
+        operator = tokens[0]
+        tokens.pop(0)
+        expr_result = expr(tokens)
+        return f"{term_result} {operator} {expr_result}"
+    else:
+        return term_result
+
+def term(tokens):
+    factor_result = factor(tokens)
+
+    if len(tokens) > 0 and (tokens[0] == '*' or tokens[0] == '/'):
+        operator = tokens[0]
+        tokens.pop(0)
+        term_result = term(tokens)
+        return f"{factor_result} {operator} {term_result}"
+    else:
+        return factor_result
+
+def factor(tokens):
+    if tokens[0] == '(':
+        tokens.pop(0)
+        expr_result = expr(tokens)
+        if tokens[0] == ')':
+            tokens.pop(0)
+            return f"({expr_result})"
+        else:
+            raise ValueError("Mismatched parentheses")
+    elif tokens[0].isdigit():
+        num = tokens[0]
+        tokens.pop(0)
+        return num
+    else:
+        raise ValueError("Invalid expression")
+
+if __name__ == "__main__":
+    user_input = input("Enter an arithmetic expression: ")
+    tokens = user_input.split()
+
+    try:
+        result = expr(tokens)
+        if len(tokens) == 0:
+            print("Parsed Result:", result)
+        else:
+            print("Error: Unable to parse the entire input")
+    except ValueError as e:
+        print(f"Error: {e}")
